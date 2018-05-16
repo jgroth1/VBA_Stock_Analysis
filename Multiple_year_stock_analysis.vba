@@ -9,8 +9,8 @@
 Sub StockAnalysis()
 dim ws as Worksheet
 dim tick() as string
-dim int_value as float
-dim end_value as float
+'dim int_value as float
+'dim end_value as float
 dim lastrow as long
 dim lr_ticks as long
 dim t as string
@@ -19,30 +19,38 @@ dim t as string
 for each ws in Worksheets
 
     '-------------------------------------------------------------
-    ' extracts the last row from collumn 1
+    ' extracts the last row from collumn 1 (A)
     lastrow = ws.Cells(Rows.count, 1).End(xlUp).Row
     '------------------------------------------------------------
-    ' Activates the worksheet in ws
+    ' Activates the worksheet in ws so that in the next step
+    ' Active sheet can be used in the advancedfilter method.
     ws.Activate
     '------------------------------------------------------------
     ' extracts the unique values from the ticker collumn
-    ' and inserts them to collumn J
+    ' and inserts them to column I. Causes an extra value of
+    ' the first ticker value to be inserted.
     ActiveSheet.Range("A2:A" & lastrow).AdvancedFilter _
     Action:=xlFilterCopy, _
     CopyToRange:=ActiveSheet.Range("I2"), _
     Unique:=True
     '-------------------------------------------------------------
-    ' places the unique ticker values into array tick
+    ' finds the last row of column I containing the new unique tick
+    ' values.
     lr_ticks = ws.Cells(Rows.count, 9).End(xlUp).Row
-    tick = Range(ws.Cells(3,9), ws.Cells(lr_ticks,9)).Value
+    
     '-------------------------------------------------------------
     ' loops through tick for each ticker value
-    for each t in tick
-        
-        
+    for i = 3 to lr_ticks
 
-    next
-    
+        ' places the value from each cell into the array "tick".  
+        ' there is a duplicate of the first tick so the loop
+        ' starts at row 3 skipping the first instance of the first
+        ' tick value.
+        tick(i - 3) = ws.Cells(i, 9).value
+
+    next i
+    ws.columns(9).ClearContents
+    Range(ws.Cells(2,9), ws.Cells(lr_ticks-1,9)).Value = tick
 
 next ws
 
