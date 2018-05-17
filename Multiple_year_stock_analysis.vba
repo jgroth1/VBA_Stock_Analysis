@@ -21,6 +21,12 @@ dim EndRow as long
 dim yearly_change as double
 dim percent_change as double
 dim yearly_volume as double
+dim greatest as double
+dim least as double
+dim GVol as double
+dim G_row as long
+dim L_row as long
+dim GV_row as long
 
 
 
@@ -91,14 +97,23 @@ for each ws in Worksheets
 
             end if
         next j
-
-        int_value = ws.Cells(StartRow, 3).Value
+        
+        for k = StartRow to EndRow
+            if (ws.Cells(k, 3).Value <> 0) then
+                int_value = ws.Cells(k, 3).Value
+                exit for
+            End if
+        next k
+        
         end_value = ws.Cells(EndRow, 6).Value
         
         yearly_change = end_value - int_value
-
-        percent_change = (yearly_change / int_value) * 100
-
+        
+        if (yearly_change = 0) then
+            percent_change = 0
+        else
+            percent_change = (yearly_change / int_value) * 100
+        End if
         yearly_volume = 0
         for n = StartRow to EndRow
 
@@ -117,6 +132,42 @@ for each ws in Worksheets
         ws.Cells(i-1, 12).Value = yearly_volume
     next i
     
+    greatest = Cells(2, 11).Value
+    least = Cells(2, 11).Value
+    GVol = Cells(2, 12).Value
+    G_row = 2
+    L_row = 2
+    GV_row = 2
+    for m = 3 to (lr_ticks - 1)
+
+        if (Cells(m, 11).Value > greatest) then
+            greatest = Cells(m, 11).Value
+            G_row = m
+        End if
+
+        if (Cells(m, 11).Value < least) then
+            least = Cells(m, 11).Value
+            L_row = m
+        End if
+
+        if (Cells(m, 12).Value > GVol) then
+            GVol = Cells(m, 12).Value
+            GV_row = m
+        End if
+
+    next m
+
+    ' insert ticker and value for greatest % increase
+    Cells(2, 15).Value = Cells(G_row, 9).Value
+    Cells(2, 16).Value = greatest
+
+    ' insert ticker and value for greatest % decrease
+    Cells(3, 15).Value = Cells(L_row, 9).Value
+    Cells(3, 16).Value = least
+
+    ' insert ticker and value for greatest total volume
+    Cells(4, 15).Value = Cells(GV_row, 9).Value
+    Cells(4, 16).Value = GVol
     
 
 next ws
