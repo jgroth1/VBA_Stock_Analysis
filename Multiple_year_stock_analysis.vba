@@ -8,6 +8,7 @@
 
 Sub StockAnalysis()
 
+' Initialize Values
 dim ws as Worksheet
 dim tick as string
 dim int_value as double
@@ -62,7 +63,9 @@ for each ws in Worksheets
     lr_ticks = ws.Cells(Rows.count, 9).End(xlUp).Row
     
     '-------------------------------------------------------------
+    ' initializes start value for the For loop (j)
     start_value = 2
+    '-------------------------------------------------------------
     ' loops through tick for each ticker value
     for i = 3 to lr_ticks
 
@@ -81,6 +84,7 @@ for each ws in Worksheets
             ws.Cells(i, 9).ClearContents
         end if
 
+        ' finds the begining and end of the values for a given stock
         StartRow = start_value
 
         for j = start_value to lastrow
@@ -98,23 +102,27 @@ for each ws in Worksheets
             end if
         next j
         
+        'finds first non zero  stock value for percentage change
         for k = StartRow to EndRow
             if (ws.Cells(k, 3).Value <> 0) then
                 int_value = ws.Cells(k, 3).Value
                 exit for
             End if
         next k
-        
+        ' assigns the end value of the stock fo the year
         end_value = ws.Cells(EndRow, 6).Value
         
+        ' values are calculated from the initial and end values
         yearly_change = end_value - int_value
         
+        ' checks if yearly change is zero if zero 0 is assigned to percentage change if not then the percentage change is calculated ()
         if (yearly_change = 0) then
             percent_change = 0
         else
             percent_change = (yearly_change / int_value) * 100
         End if
         yearly_volume = 0
+        
         for n = StartRow to EndRow
 
             yearly_volume = yearly_volume + ws.Cells(n,7)
@@ -131,13 +139,15 @@ for each ws in Worksheets
         ws.Cells(i-1, 11).Value = percent_change
         ws.Cells(i-1, 12).Value = yearly_volume
     next i
-    
+    'takes first value and row as first set value for comparison
     greatest = Cells(2, 11).Value
     least = Cells(2, 11).Value
     GVol = Cells(2, 12).Value
     G_row = 2
     L_row = 2
     GV_row = 2
+
+    'loops through data if value is greater or less than current value of greatest, least, GVol the value is replaced and m is assigned to the row number.
     for m = 3 to (lr_ticks - 1)
 
         if (Cells(m, 11).Value > greatest) then
